@@ -30,3 +30,32 @@ part1 input = do
   line <- lines input
   let button = complexToButton $ foldl advance 0 $ map direction line
   return button
+
+complexToButton2 :: Complex Float -> Char
+complexToButton2 (  0  :+   2)  = '1'
+complexToButton2 ((-1) :+   1)  = '2'
+complexToButton2 (  0  :+   1)  = '3'
+complexToButton2 (  1  :+   1)  = '4'
+complexToButton2 ((-2) :+   0)  = '5'
+complexToButton2 ((-1) :+   0)  = '6'
+complexToButton2 (  0  :+   0)  = '7'
+complexToButton2 (  1  :+   0)  = '8'
+complexToButton2 (  2  :+   0)  = '9'
+complexToButton2 ((-1) :+ (-1)) = 'A'
+complexToButton2 (  0  :+ (-1)) = 'B'
+complexToButton2 (  1  :+ (-1)) = 'C'
+complexToButton2 (  0  :+ (-2)) = 'D'
+complexToButton2 _              = '0' -- default
+
+advance2 :: Complex Float -> Complex Float -> Complex Float
+advance2 pos dir =
+  let pos' = pos + dir
+  in if complexToButton2 pos' == '0'
+  then pos
+  else pos'
+
+part2 :: String -> String
+part2 input = do
+  line <- lines input
+  let button = complexToButton2 $ foldl advance2 0 $ map direction line
+  return button
