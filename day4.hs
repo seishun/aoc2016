@@ -11,6 +11,21 @@ sectorIdOrZero room =
   then read [d1,d2,d3]
   else 0
 
+rotate :: Int -> Char -> Char
+rotate _ '-' = ' '
+rotate id c =
+  let i = fromEnum c - fromEnum 'a'
+      i' = (i + id) `mod` 26
+  in toEnum (i' + fromEnum 'a')
+
+decrypt :: String -> (String, Int)
+decrypt room =
+  let (']':_:_:_:_:_:'[':d3:d2:d1:xs) = reverse room
+      id = read [d1,d2,d3]
+  in (map (rotate id) $ reverse xs, id)
+
 part1 :: String -> Int
 part1 = sum . map sectorIdOrZero . lines
 
+part2 :: String -> [(String, Int)]
+part2 = filter (isInfixOf "north" . fst) . map decrypt . lines
