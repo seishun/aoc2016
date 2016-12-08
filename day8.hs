@@ -27,5 +27,11 @@ parse ["rotate", "column", 'x':'=':a, "by", b] =
       b' = read b
   in rotateColumn a' b'
 
+swipe :: String -> [String]
+swipe = foldl (flip parse) (replicate 6 $ replicate 50 '.') . map words . lines
+
 part1 :: String -> Int
-part1 = length . filter (== '#') . concat . foldl (flip parse) (replicate 6 $ replicate 50 '.') . map words . lines
+part1 = length . filter (== '#') . concat . swipe
+
+part2 :: String -> IO ()
+part2 = mapM_ putStrLn . swipe
