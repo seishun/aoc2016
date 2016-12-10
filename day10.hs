@@ -54,3 +54,11 @@ parse ["bot", bot, "gives", "low", "to", "output", toLower, "and", "high", "to",
 
 part1 :: String -> Int
 part1 = head . keys . filter (`elem` [(61, 17), (17, 61)]) . fst . foldl (flip parse) (empty, empty) . map words . lines
+
+part2 :: String -> Int
+part2 input =
+  let (outputs, _) = foldl (flip parse) (empty, empty) . map words . lines $ input
+      (output0, _) = outputs ! (-1)
+      (output1, _) = outputs ! (-2)
+      (output2, _) = outputs ! (-3)
+  in output0 * output1 * output2
