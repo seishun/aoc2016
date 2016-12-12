@@ -2,6 +2,8 @@ import Data.List
 import Data.List.Split
 import Data.Map hiding (null, foldl, map)
 import qualified Data.Map as Map
+import Data.Set (Set)
+import qualified Data.Set as Set
 import Control.Monad
 
 data Item = Elevator | Generator String | Chip String deriving (Eq, Ord)
@@ -27,15 +29,13 @@ neighbors state = do
   guard $ all (isValidFloor . keys . flip Map.filter newState) [(== elevatorFloor), (== newFloor)]
   return newState
 
-dijkstra :: State -> Map State Int -> Map State Int -> Int
+dijkstra :: State -> Set State -> Set State -> Int
 dijkstra target visited unvisited =
-  let (current, distance) = head $ sortOn snd $ toList unvisited
-      tentative = fromList [(k, distance + 1) | k <- neighbors current, notMember k visited]
-      unvisited' = Map.delete current $ unionWith min unvisited tentative
-      visited' = Map.insert current distance visited
-  in if current == target
-  then distance
-  else dijkstra target visited' unvisited'
+  if Set.member target unvisited
+  then 0
+  else let unvisited' = Set.filter (`Set.notMember` visited) $ Set.fromList $ concatMap neighbors unvisited
+           visited' = Set.union visited unvisited
+  in 1 + dijkstra target visited' unvisited'
 
 parseItem :: [String] -> [Item]
 parseItem ("a":t:"generator,":xs) = Generator t : parseItem xs
@@ -54,6 +54,13 @@ parse state ("The":"fourth":"floor":"contains":xs) = Map.union state $ fromList 
 
 part1 :: String -> Int
 part1 input =
-  let initial = foldl parse (fromList [(Elevator, 1)]) $ map words $ lines input
+  let initial = foldl parse (Map.fromList [(Elevator, 1)]) $ map words $ lines input
       target = Map.map (const 4) initial
-  in dijkstra target empty (fromList [(initial, 0)])
+  in dijkstra target Set.empty (Set.singleton initial)
+
+part2 :: String -> Int
+part2 input =
+  let firstFloor = [Elevator, Generator "elerium", Chip "elerium", Generator "dilithium", Chip "dilithium"]
+      initial = foldl parse (Map.fromList [(k, 1) | k <- firstFloor]) $ map words $ lines input
+      target = Map.map (const 4) initial
+  in dijkstra target Set.empty (Set.singleton initial)
