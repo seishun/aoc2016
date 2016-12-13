@@ -36,3 +36,6 @@ parse ["jnz", x, y] = let y' = read y in case x of
 
 part1 :: String -> Int
 part1 = execute 0 (fromList [(c, 0) | c <- "abcd"]) . map (parse . words) . lines
+
+part2 :: String -> Int
+part2 = execute 0 (fromList [('a', 0),('b', 0),('c', 1),('d', 0)]) . map (parse . words) . lines
