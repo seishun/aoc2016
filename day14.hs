@@ -5,6 +5,9 @@ import Data.List
 hashWith :: String -> Int -> String
 hashWith salt = show . md5 . append (pack salt) . pack . show
 
+stretchHash :: String -> String
+stretchHash hash = iterate (show . md5 . pack) hash !! 2016
+
 findTriplet :: String -> Maybe Char
 findTriplet (c1:c2:c3:xs)
   | c1 == c2 && c2 == c3 = Just c1
@@ -26,5 +29,11 @@ findKeys count (x:xs) =
 hashes :: String -> [String]
 hashes salt = map (hashWith salt) [0..]
 
+stretchedHashes :: String -> [String]
+stretchedHashes = map stretchHash . hashes
+
 part1 :: String -> Int
 part1 = findKeys 64 . hashes
+
+part2 :: String -> Int
+part2 = findKeys 64 . stretchedHashes
