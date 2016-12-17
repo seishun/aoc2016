@@ -1,6 +1,7 @@
 import Control.Monad
 import Data.ByteString.Lazy.Char8 (pack)
 import Data.Digest.Pure.MD5
+import Data.Maybe
 
 type Path = (String, (Int, Int))
 
@@ -19,5 +20,16 @@ bfs unvisited passcode = case filter ((== (4, 4)) . snd) unvisited of
   [] -> let unvisited' = concatMap (neighbors passcode) unvisited
         in bfs unvisited' passcode
 
+longestPath :: String -> Path -> Maybe Int
+longestPath passcode (path, (x, y))
+  | (x, y) == (4, 4) = Just $ length path
+  | otherwise =
+    let paths = mapMaybe (longestPath passcode) $ neighbors passcode (path, (x, y))
+    in if null paths then Nothing
+    else Just $ maximum paths
+
 part1 :: String -> String
 part1 = bfs [("", (1,1))]
+
+part2 :: String -> Int
+part2 input = fromJust $ longestPath input ("", (1,1))
