@@ -20,3 +20,8 @@ part1 :: String -> Int
 part1 input =
   let discs = map (parse . words) . lines $ input
   in head [time | time <- [0..], getsCapsule $ wait time discs]
+
+part2 :: String -> Int
+part2 input =
+  let discs = (map (parse . words) . lines $ input) ++ [(0, 11)]
+  in head [time | time <- [0..], getsCapsule $ wait time discs]
