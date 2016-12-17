@@ -21,3 +21,6 @@ checksum string
 
 part1 :: String -> String
 part1 = checksum . fill 272
+
+part2 :: String -> String
+part2 = checksum . fill 35651584
