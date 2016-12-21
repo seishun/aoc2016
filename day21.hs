@@ -31,6 +31,12 @@ basedRotate x string =
       times = 1 + index + fromEnum (index >= 4)
   in rotateRight times string
 
+basedRotate' :: Char -> Seq Char -> Seq Char
+basedRotate' x string =
+  let (Just index) = elemIndexL x string
+      times = [7,7,2,6,1,5,0,4] !! index
+  in rotateRight times string
+
 reversePos :: Int -> Int -> Seq Char -> Seq Char
 reversePos x y string =
   let slice = reverse $ drop x $ take (y + 1) string
@@ -41,14 +47,17 @@ move x y string =
   let x' = string `index` x
   in insertAt y x' $ deleteAt x string
 
-parse :: [String] -> Seq Char -> Seq Char
-parse ["swap", "position", x, "with", "position", y] = swapPos (read x) (read y)
-parse ["swap", "letter", [x], "with", "letter", [y]] = swapLetter x y
-parse ["rotate", "left", x, _] = rotateLeft (read x)
-parse ["rotate", "right", x, _] = rotateRight (read x)
-parse ["rotate", "based", "on", "position", "of", "letter", [x]] = basedRotate x
-parse ["reverse", "positions", x, "through", y] = reversePos (read x) (read y)
-parse ["move", "position", x, "to", "position", y] = move (read x) (read y)
+parse :: Bool -> [String] -> Seq Char -> Seq Char
+parse _ ["swap", "position", x, "with", "position", y] = swapPos (read x) (read y)
+parse _ ["swap", "letter", [x], "with", "letter", [y]] = swapLetter x y
+parse u ["rotate", "left", x, _] = (if u then rotateRight else rotateLeft) (read x)
+parse u ["rotate", "right", x, _] = (if u then rotateLeft else rotateRight) (read x)
+parse u ["rotate", "based", "on", "position", "of", "letter", [x]] = (if u then basedRotate' else basedRotate) x
+parse _ ["reverse", "positions", x, "through", y] = reversePos (read x) (read y)
+parse u ["move", "position", x, "to", "position", y] = (if u then flip move else move) (read x) (read y)
 
 part1 :: String -> String
-part1 = toList . foldl (flip ($)) (fromList "abcdefgh") . map (parse . words) . lines
+part1 = toList . foldl (flip ($)) (fromList "abcdefgh") . map (parse False . words) . lines
+
+part2 :: String -> String
+part2 = toList . foldr ($) (fromList "fbgdceah") . map (parse True . words) . lines
