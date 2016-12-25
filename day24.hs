@@ -23,8 +23,8 @@ bfs m target visited unvisited =
            visited' = Set.union visited unvisited
   in 1 + bfs m target visited' unvisited'
 
-tsp :: Map -> Int
-tsp m = minimum $ map total (permutations "1234567")
+tsp :: Map -> [String] -> Int
+tsp m orders = minimum $ map total orders
   where total = snd . foldl (\(from, dist) to -> (to, dist + distances ! (from, to))) ('0', 0)
         distances = Map.fromList $ do
           from <- "01234567"
@@ -44,4 +44,10 @@ part1 :: String -> Int
 part1 input =
   let rows = lines input
       width = length $ head rows
-  in tsp (concat rows, width)
+  in tsp (concat rows, width) $ permutations "1234567"
+
+part2 :: String -> Int
+part2 input =
+  let rows = lines input
+      width = length $ head rows
+  in tsp (concat rows, width) $ map (++ "0") (permutations "1234567")
